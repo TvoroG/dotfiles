@@ -1,14 +1,18 @@
 #!/bin/sh
 
+ensure_link() {
+    test -L "$2" || ln -srv "$1" "$2"
+}
+
 configure_vim() {
     echo "vim configuration"
-    cp -v "vimrc" "$HOME/.vimrc"
+    ensure_link "vimrc" "$HOME/.vimrc"
 
     if [ ! -d "$HOME/.vim/bundle/vundle" ]; then
         echo "Vundle installation"
         git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
     fi
-    cp -v "vundles.vim" "$HOME/.vim"
+    ensure_link "vundles.vim" "$HOME/.vim/vundles.vim"
 }
 
 configure_wmii() {
@@ -18,12 +22,12 @@ configure_wmii() {
         mkdir -v "$HOME/.wmii"
         cp -v "/etc/wmii/wmiirc" "$HOME/.wmii"
     fi
-    cp -v "wmiirc_local" "$HOME/.wmii"
+    ensure_link "wmiirc_local" "$HOME/.wmii/wmiirc_local"
 }
 
 configure_zsh() {
     echo "zsh configuration"
-    cp -v "zshrc" "$HOME/.zshrc"
+    ensure_link "zshrc" "$HOME/.zshrc"
 
     if [ ! -d "$HOME/.oh-my-zsh" ]; then
         echo "oh-my-zsh installation"
@@ -33,16 +37,13 @@ configure_zsh() {
 
 configure_X() {
     echo "X configuration"
-    cp -v "Xdefaults" "$HOME/.Xdefaults"
+    ensure_link "Xdefaults" "$HOME/.Xdefaults"
 }
 
-read -p "All files wil be overwritten. Are you sure [yn]? " is_ok
-if [ "$is_ok" == "y" ]; then
-    configure_vim
-    echo 
-    configure_wmii
-    echo
-    configure_zsh
-    echo
-    configure_X
-fi
+configure_vim
+echo 
+configure_wmii
+echo
+configure_zsh
+echo
+configure_X
