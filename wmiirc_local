@@ -1,0 +1,4 @@
+MODKEY=Mod4
+
+WMII_FONT='xft:Sans-8'
+WMII_TERM="urxvt"
