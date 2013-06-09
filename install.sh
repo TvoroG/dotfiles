@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ensure_link() {
-    test -L "$2" || ln -srv "$1" "$2"
+    test -L "$2" || ln -sfv "$(pwd)/$1" "$2"
 }
 
 configure_vim() {
@@ -10,7 +10,8 @@ configure_vim() {
 
     if [ ! -d "$HOME/.vim/bundle/vundle" ]; then
         echo "Vundle installation"
-        git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
+        git clone https://github.com/gmarik/vundle.git "$HOME/.vim/bundle/vundle"
+        vim -u "$HOME/.vim/vundles.vim" +BundleInstall +qa
     fi
     ensure_link "vundles.vim" "$HOME/.vim/vundles.vim"
 }
@@ -31,7 +32,7 @@ configure_zsh() {
 
     if [ ! -d "$HOME/.oh-my-zsh" ]; then
         echo "oh-my-zsh installation"
-        git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+        git clone git://github.com/robbyrussell/oh-my-zsh.git "$HOME/.oh-my-zsh"
     fi
 }
 
