@@ -5,7 +5,7 @@ ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="gentoo"
+ZSH_THEME="mh"
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -14,7 +14,7 @@ ZSH_THEME="gentoo"
 # Set to this to use case-sensitive completion
 # CASE_SENSITIVE="true"
 
-# Comment this out to disable bi-weekly auto-update checks
+# Uncomment this to disable bi-weekly auto-update checks
 # DISABLE_AUTO_UPDATE="true"
 
 # Uncomment to change how often before auto-updates occur? (in days)
@@ -45,4 +45,17 @@ plugins=(git)
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
-alias alm="alsamixer" 
+#my alias
+alias alm='alsamixer'
+alias emw='emacs -nw'
+
+PATH=/home/marsel/.cabal/bin:$PATH
+PATH=$PATH:/home/marsel/programming/quipper-0.6/quipper/scripts
+
+#my sources
+source ~/.git-completion.bash
+EDITOR="emacsclient -c"
+export LD_LIBRARY_PATH="/usr/local/lib"
+
+complete -cf sudo
+complete -cf man

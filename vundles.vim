@@ -7,7 +7,6 @@ call vundle#rc()
 Bundle 'gmarik/vundle'
 
 " My Bundles here
-Bundle 'taglist.vim'
 Bundle 'JavaBrowser'
 Bundle 'javacomplete'
 Bundle 'L9'

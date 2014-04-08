@@ -16,16 +16,6 @@ configure_vim() {
     ensure_link "vundles.vim" "$HOME/.vim/vundles.vim"
 }
 
-configure_wmii() {
-    echo "wmii configuration"
-    if [ ! -d "$HOME/.wmii" ]; then
-        echo "copy default wmiirc file"
-        mkdir -v "$HOME/.wmii"
-        cp -v "/etc/wmii/wmiirc" "$HOME/.wmii"
-    fi
-    ensure_link "wmiirc_local" "$HOME/.wmii/wmiirc_local"
-}
-
 configure_zsh() {
     echo "zsh configuration"
     ensure_link "zshrc" "$HOME/.zshrc"
@@ -43,8 +33,6 @@ configure_X() {
 
 configure_vim
 echo 
-configure_wmii
-echo
 configure_zsh
 echo
 configure_X
