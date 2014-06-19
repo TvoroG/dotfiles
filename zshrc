@@ -54,8 +54,14 @@ PATH=$PATH:/home/marsel/programming/quipper-0.6/quipper/scripts
 
 #my sources
 source ~/.git-completion.bash
-EDITOR="emacsclient -c"
+export EDITOR="vim"
 export LD_LIBRARY_PATH="/usr/local/lib"
 
 complete -cf sudo
 complete -cf man
+
+PATH="/home/marsel/perl5/bin${PATH+:}$PATH"; export PATH;
+PERL5LIB="/home/marsel/perl5/lib/perl5${PERL5LIB+:}$PERL5LIB"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/home/marsel/perl5${PERL_LOCAL_LIB_ROOT+:}$PERL_LOCAL_LIB_ROOT"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/home/marsel/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/home/marsel/perl5"; export PERL_MM_OPT;
