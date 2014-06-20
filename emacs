@@ -14,7 +14,8 @@
        ;; list of packages from official recipes
        '(magit js2-mode haskell-mode color-theme color-theme-sanityinc
                color-theme-almost-monokai jedi autopair flycheck
-               python-mode rust-mode edbi git-gutter nxhtml helm)
+               python-mode rust-mode edbi git-gutter nxhtml helm
+               projectile)
 
        (mapcar 'el-get-as-symbol (mapcar 'el-get-source-name el-get-sources))))
 
@@ -34,8 +35,10 @@
 ;; Django
 (add-to-list 'auto-mode-alist '("\\.html$" . django-html-mumamo-mode))
 
+
 ;;;; Javascript
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
 
 ;;;; autopair
 (autopair-global-mode)
@@ -50,5 +53,30 @@
 
 ;;;; helm
 (helm-mode 1)
-(global-set-key (kbd "C-c h") 'helm-mini)
+(global-set-key (kbd "C-c h") 'helm-projectile)
 (global-set-key (kbd "C-c C-f") 'helm-find-files)
+
+;;;; windows
+(defun split-window3()
+  (interactive)
+  (progn (delete-other-windows)
+         (split-window-horizontally)
+         (split-window-vertically)
+         (other-window 2)))
+
+(global-set-key (kbd "M-1") 'delete-other-windows)
+(global-set-key (kbd "M-2") 'split-window-below)
+(global-set-key (kbd "M-3") 'split-window-right)
+(global-set-key (kbd "M-0") 'delete-window)
+(global-set-key (kbd "M-s") 'other-window)
+(global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
+(global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
+
+;;;; dired
+(setq dired-recursive-copies 'always)
+(setq dired-recursive-deletes 'top)
+
+;;;; projectile
+;;(add-hook 'python-mode-hook 'projectile-on)
+;;(add-hook 'js2-mode-hook 'projectile-on)
+(projectile-global-mode)
