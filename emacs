@@ -15,7 +15,7 @@
        '(magit js2-mode haskell-mode color-theme color-theme-sanityinc
                color-theme-almost-monokai jedi autopair flycheck
                python-mode rust-mode edbi git-gutter nxhtml helm
-               projectile)
+               projectile yasnippet)
 
        (mapcar 'el-get-as-symbol (mapcar 'el-get-source-name el-get-sources))))
 
@@ -80,3 +80,7 @@
 ;;(add-hook 'python-mode-hook 'projectile-on)
 ;;(add-hook 'js2-mode-hook 'projectile-on)
 (projectile-global-mode)
+
+;;;; yasnippet
+(yas-global-mode 1)
+(define-key yas-minor-mode-map (kbd "C-c C-e") 'yas-expand)
