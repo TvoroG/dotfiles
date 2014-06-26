@@ -15,19 +15,28 @@
        '(magit js2-mode haskell-mode color-theme color-theme-sanityinc
                color-theme-almost-monokai jedi autopair flycheck
                python-mode rust-mode edbi git-gutter nxhtml helm
-               projectile yasnippet)
+               projectile yasnippet fill-column-indicator)
 
        (mapcar 'el-get-as-symbol (mapcar 'el-get-source-name el-get-sources))))
 
 (el-get 'sync my-packages)
 
-;;;; Themes
+;;;; customization
+(setq default-input-method "russian-computer")
 ;;(load-theme 'misterioso)
 
 ;;;; Python
 ;; M-x jedi:install-server RET
 (add-hook 'python-mode-hook 'jedi:setup)
 (setq jedi:complete-on-dot t)
+
+(defun jedi-config:setup-keys ()
+  (local-set-key (kbd "M-.") 'jedi:goto-definition)
+  (local-set-key (kbd "M-,") 'jedi:goto-definition-pop-marker)
+  (local-set-key (kbd "M-?") 'jedi:show-doc)
+  (local-set-key (kbd "M-/") 'jedi:get-in-function-call))
+(add-hook 'python-mode-hook 'jedi-config:setup-keys)
+
 ;; flycheck, pylint, hlint
 (add-hook 'python-mode-hook 'flycheck-mode)
 ;; check manually: C-c ! c
@@ -84,3 +93,9 @@
 ;;;; yasnippet
 (yas-global-mode 1)
 (define-key yas-minor-mode-map (kbd "C-c C-e") 'yas-expand)
+
+;;;; fci
+(define-globalized-minor-mode
+  global-fci-mode fci-mode (lambda () (fci-mode 1)))
+(global-fci-mode t)
+(setq fci-rule-column 80)
