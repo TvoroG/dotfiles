@@ -15,7 +15,8 @@
        '(magit js2-mode haskell-mode color-theme color-theme-sanityinc
                color-theme-almost-monokai jedi autopair flycheck
                python-mode rust-mode edbi git-gutter nxhtml helm
-               projectile yasnippet fill-column-indicator)
+               projectile yasnippet fill-column-indicator
+               virtualenvwrapper color-theme-solarized)
 
        (mapcar 'el-get-as-symbol (mapcar 'el-get-source-name el-get-sources))))
 
@@ -23,6 +24,8 @@
 
 ;;;; customization
 (setq default-input-method "russian-computer")
+(load-theme 'solarized-dark t)
+(set-default-font "Source Code Pro")
 ;;(load-theme 'misterioso)
 
 ;;;; Python
@@ -43,6 +46,11 @@
 (setq flycheck-check-syntax-automatically '())
 ;; Django
 (add-to-list 'auto-mode-alist '("\\.html$" . django-html-mumamo-mode))
+;; virtualenvwrapper
+(venv-initialize-interactive-shells)
+(venv-initialize-eshell)
+(setq venv-location "~/.virtualenvs")
+;;(setenv "PYTHONPATH" "path")
 
 
 ;;;; Javascript
