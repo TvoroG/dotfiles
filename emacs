@@ -6,8 +6,7 @@
 
 ;; personal recipes
 (setq el-get-sources
-      '((:name better-defualts
-	       :type github :pkgname "technomancy/better-defaults")))
+      '((:name better-defualts :type github :pkgname "technomancy/better-defaults")))
 
 (setq my-packages
       (append
@@ -15,8 +14,8 @@
        '(magit js2-mode haskell-mode color-theme color-theme-sanityinc
                color-theme-almost-monokai jedi autopair flycheck
                python-mode rust-mode edbi git-gutter nxhtml helm
-               projectile yasnippet fill-column-indicator
-               virtualenvwrapper color-theme-solarized)
+               projectile yasnippet fill-column-indicator tern
+               virtualenvwrapper color-theme-solarized auto-complete)
 
        (mapcar 'el-get-as-symbol (mapcar 'el-get-source-name el-get-sources))))
 
@@ -51,10 +50,18 @@
 (venv-initialize-eshell)
 (setq venv-location "~/.virtualenvs")
 ;;(setenv "PYTHONPATH" "path")
+(add-hook 'python-mode-hook (lambda () (fci-mode t)))
 
 
 ;;;; Javascript
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(add-hook 'js2-mode-hook (lambda () (fci-mode t)))
+(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+(eval-after-load 'tern
+   '(progn
+      (require 'tern-auto-complete)
+      (tern-ac-setup)))
+(setq tern-ac-on-dot t)
 
 
 ;;;; autopair
@@ -105,5 +112,8 @@
 ;;;; fci
 (define-globalized-minor-mode
   global-fci-mode fci-mode (lambda () (fci-mode 1)))
-(global-fci-mode t)
-(setq fci-rule-column 80)
+;;(global-fci-mode t)
+(setq fci-rule-column 100)
+
+;;;; auto-complete
+(global-auto-complete-mode)
