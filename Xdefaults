@@ -16,6 +16,16 @@ URxvt.saveLines: 3000
 URxvt.termName: rxvt
 URxvt.internalBorder: 0
 URxvt.jumpScroll: true
+URxvt.url-launcher: /run/current-system/sw/bin/xdg-open
+URxvt.matcher.button: 1
+URxvt.matcher.rend.0: Uline Bold fg5
+URxvt.perl-ext: default,url-select
+URxvt.perl-ext-common: default,keyboard-select,selection-to-clipboard
+URxvt.keysym.M-u: perl:url-select:select_next
+URxvt.url-select.launcher: /run/current-system/sw/bin/xdg-open
+URxvt.url-select.underline: true
+URxvt.clipboard.autocopy: true
+URxvt.clipboard.copycmd: xclip -in -selection clipboard
 
 ! Black
 *color0:   #000000
