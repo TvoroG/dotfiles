@@ -3,17 +3,20 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }:
-let npkgs = import <nixpkgs> {};
+let
+  callPackage = pkgs.lib.callPackageWith (pkgs // pkgs.xlibs // mypkgs);
+  mypkgs = {
+    popcorntime = callPackage ./pkgs/applications/video/popcorntime {
+      nwjs = pkgs.nwjs_0_12;
+      gconf = pkgs.gnome2.GConf;
+      gtk = pkgs.gtk2;
+    };
+  };
 in {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
-
-  fileSystems."/home" = {
-    device = "/dev/disk/by-label/home";
-    fsType = "ext4";
-  };
 
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
@@ -21,8 +24,15 @@ in {
   # Define on which hard drive you want to install Grub.
   boot.loader.grub.device = "/dev/sdb";
 
+  boot.extraModprobeConfig =
+  ''
+  options rtl8723be fwlps=N ips=N
+  '';
+
   networking.hostName = "tvorog"; # Define your hostname.
-  networking.networkmanager.enable = true;
+  networking.networkmanager = {
+    enable = true;
+  };
 
   # Select internationalisation properties.
   i18n = {
@@ -78,12 +88,12 @@ in {
     home = "/home/marsel";
     group = "marsel";
     extraGroups = [ "wheel" "networkmanager" "audio" "video" "docker" "vboxusers"];
-    openssh.authorizedKeys.keyFiles = ["/home/marsel/.ssh/id_rsa.pub" "/home/marsel/.ssh/lab_id_rsa.pub"];
+   # openssh.authorizedKeys.keyFiles = ["/home/marsel/.ssh/id_rsa.pub" "/home/marsel/.ssh/lab_id_rsa.pub"];
   };
   users.extraGroups.marsel.gid = 1000;
 
   # The NixOS release to be compatible with for stateful data such as databases.
-  system.stateVersion = "16.03";
+  system.stateVersion = "16.09";
 
   # services.logind.extraConfig = "HandleLidSwitch=ignore";
 
@@ -93,7 +103,11 @@ in {
   programs.zsh.enable = true;
   users.defaultUserShell = "/run/current-system/sw/bin/zsh";
 
-  networking.extraHosts = "127.0.0.1 dev.24smi.org";
+  networking.extraHosts = ''
+  127.0.0.1 dev.24smi.org dev.glavnoe.io
+  127.0.0.1 gitlab
+  127.0.0.1 smi.net
+  '';
 
   services.tlp.enable = true;
 
@@ -107,14 +121,37 @@ in {
     allowBroken = true;
   };
 
+  services.printing = {
+    enable = true;
+    drivers = [ pkgs.splix ];
+  };
+
+  services.emacs.enable = true;
+  services.emacs.defaultEditor = true;
+
   virtualisation.docker.enable = true;
   virtualisation.virtualbox.host.enable = true;
   virtualisation.virtualbox.guest.enable = true;
 
+  # services.offlineimap.enable = true;
+
   nixpkgs.config.chromium = {
-    enablePepperFlash = true;
+    # enablePepperFlash = true;
     enablePepperPDF = true;
   };
+
+  nixpkgs.config.packageOverrides = super: let self = super.pkgs; in {
+    ansible2 = super.ansible2.overrideDerivation (old: rec {
+      version = "2.2.0.0";
+      name = "ansible-${version}";
+      src = pkgs.fetchurl {
+        url = "http://releases.ansible.com/ansible/${name}.tar.gz";
+        sha256 = "11l5814inr44ammp0sh304rqx2382fr629c0pbwf0k1rjg99iwfr";
+      };
+    });
+  };
+
+  nix.nixPath = [ "/home/marsel/programming" "nixpkgs=/home/marsel/programming/nixpkgs" "nixos-config=/etc/nixos/configuration.nix" ];
 
   environment.systemPackages = with pkgs; [
     binutils
@@ -125,6 +162,9 @@ in {
     bashInteractive
     usbutils
     glibc_multi
+    bridge-utils
+    openssl
+    gnumake
 
     hibernate
     cpufrequtils
@@ -140,46 +180,88 @@ in {
     p7zip
     unzip
     unrar
+    zip
     wget
     which
+    telnet
+    bind
+    tcpflow
+    wireshark
+    wireshark-gtk
+    nmap
+    sysstat
+    iotop
+    dstat
+    graphviz
+    ffmpeg
 
     haskellPackages.xmobar
     geeqie
+    evince
     feh
     mc
     silver-searcher
     lm_sensors
+    hddtemp
     pciutils
     hwinfo
     pavucontrol
+    libnotify
+    notify-osd
+    gnupg
     gnupg1
+    sqlite
+    msmtp
+    notmuch
     graphicsmagick
+    neomutt
+    urlview
+    imgur-screenshot
+    xfce.terminal
+    octave
 
-    emacs
     vim
     source-code-pro
 
     vagrant
+    kubernetes
 
     rxvt_unicode-with-plugins
     vlc
     gitFull
+    mercurialFull
     chromium
+    firefox
+    opera
     transmission_gtk
     cmus
     weechat
     skype
+    spotify
+    dropbox-cli
 
     ghc
+    go
+    gocode
+    rustc
+    cargo
 
-    python27Full
+    # pypy
+    python27
+    python33
+    python34
     python35
     python35Packages.flake8
     python35Packages.setuptools
-    python27Packages.ansible
-    python27Packages.virtualenvwrapper
+    python35Packages.youtube-dl
+    python27Packages.docker_compose
+    python35Packages.virtualenvwrapper
+    python35Packages.virtualenv
     python27Packages.setuptools
+    ansible2
     libyaml
     zlib
+
+    mypkgs.popcorntime
   ];
 }
