@@ -3,16 +3,8 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }:
-let
-  callPackage = pkgs.lib.callPackageWith (pkgs // pkgs.xlibs // mypkgs);
-  mypkgs = {
-    popcorntime = callPackage ./pkgs/applications/video/popcorntime {
-      nwjs = pkgs.nwjs_0_12;
-      gconf = pkgs.gnome2.GConf;
-      gtk = pkgs.gtk2;
-    };
-  };
-in {
+
+{
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
@@ -30,9 +22,20 @@ in {
   '';
 
   networking.hostName = "tvorog"; # Define your hostname.
+  # networking.nameservers = [ "127.0.0.1" ];
   networking.networkmanager = {
     enable = true;
+    # useDnsmasq = true;
   };
+
+  # services.dnsmasq = {
+  #   enable = true;
+  #   # resolveLocalQueries = true;
+  #   servers = [ "8.8.8.8" "8.8.4.4" ];
+  #   extraConfig = ''
+  #   listen-address=127.0.0.1
+  #   '';
+  # };
 
   # Select internationalisation properties.
   i18n = {
@@ -49,19 +52,12 @@ in {
   services.openssh.enable = true;
   programs.ssh.startAgent = true;
 
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-
   boot.blacklistedKernelModules = ["nouveau"];
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
   services.xserver.exportConfiguration = true;
   services.xserver.videoDrivers = ["nvidia" "intel"];
-
-  hardware.bumblebee.enable = true;
-  hardware.bumblebee.driver = "nvidia";
-  hardware.bumblebee.connectDisplay = true;
 
   services.xserver.layout = "us,ru";
   services.xserver.xkbOptions = "grp:alt_shift_toggle, ctrl:nocaps";
@@ -70,6 +66,7 @@ in {
   services.xserver.windowManager.xmonad.enable = true;
   services.xserver.windowManager.xmonad.enableContribAndExtras = true;
   services.xserver.windowManager.default = "xmonad";
+  # services.xserver.windowManager.exwm.enable = true;
   services.xserver.desktopManager.xterm.enable = false;
   services.xserver.displayManager.slim.defaultUser = "marsel";
   services.xserver.displayManager.sessionCommands =
@@ -79,7 +76,15 @@ in {
       xsetroot -cursor_name left_ptr
     '';
 
-  services.ntp.enable = true;
+  services.ntp = {
+    enable = true;
+    servers = [
+      "ntp2.stratum2.ru"
+      "ntp3.stratum2.ru"
+      "ntp4.stratum2.ru"
+      "ntp5.stratum2.ru"
+    ];
+  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.extraUsers.marsel = {
@@ -88,26 +93,22 @@ in {
     home = "/home/marsel";
     group = "marsel";
     extraGroups = [ "wheel" "networkmanager" "audio" "video" "docker" "vboxusers"];
-   # openssh.authorizedKeys.keyFiles = ["/home/marsel/.ssh/id_rsa.pub" "/home/marsel/.ssh/lab_id_rsa.pub"];
   };
-  users.extraGroups.marsel.gid = 1000;
+  users.extraGroups = {
+    marsel = {
+      gid = 1000;
+    };
+  };
 
   # The NixOS release to be compatible with for stateful data such as databases.
-  system.stateVersion = "16.09";
-
-  # services.logind.extraConfig = "HandleLidSwitch=ignore";
+  system.stateVersion = "18.03";
 
   hardware.pulseaudio.enable = true;
   hardware.pulseaudio.systemWide = true;
+  sound.enable = true;
 
   programs.zsh.enable = true;
   users.defaultUserShell = "/run/current-system/sw/bin/zsh";
-
-  networking.extraHosts = ''
-  127.0.0.1 dev.24smi.org dev.glavnoe.io
-  127.0.0.1 gitlab
-  127.0.0.1 smi.net
-  '';
 
   services.tlp.enable = true;
 
@@ -119,6 +120,7 @@ in {
   nixpkgs.config = {
     allowUnfree = true;
     allowBroken = true;
+    virtualbox.enableExtensionPack = true;
   };
 
   services.printing = {
@@ -133,25 +135,15 @@ in {
   virtualisation.virtualbox.host.enable = true;
   virtualisation.virtualbox.guest.enable = true;
 
-  # services.offlineimap.enable = true;
+  fonts.fonts = [pkgs.hack-font];
 
   nixpkgs.config.chromium = {
     # enablePepperFlash = true;
     enablePepperPDF = true;
   };
 
-  nixpkgs.config.packageOverrides = super: let self = super.pkgs; in {
-    ansible2 = super.ansible2.overrideDerivation (old: rec {
-      version = "2.2.0.0";
-      name = "ansible-${version}";
-      src = pkgs.fetchurl {
-        url = "http://releases.ansible.com/ansible/${name}.tar.gz";
-        sha256 = "11l5814inr44ammp0sh304rqx2382fr629c0pbwf0k1rjg99iwfr";
-      };
-    });
-  };
-
   nix.nixPath = [ "/home/marsel/programming" "nixpkgs=/home/marsel/programming/nixpkgs" "nixos-config=/etc/nixos/configuration.nix" ];
+  nix.binaryCaches = [ "https://cache.nixos.org/" ];
 
   environment.systemPackages = with pkgs; [
     binutils
@@ -165,6 +157,8 @@ in {
     bridge-utils
     openssl
     gnumake
+    bash
+    autoconf
 
     hibernate
     cpufrequtils
@@ -189,11 +183,17 @@ in {
     wireshark
     wireshark-gtk
     nmap
+    tcpdump
+    traceroute
     sysstat
     iotop
     dstat
     graphviz
     ffmpeg
+    openvpn
+    gnome3.networkmanagerapplet
+    gnome3.networkmanager_openvpn
+    update-resolv-conf
 
     haskellPackages.xmobar
     geeqie
@@ -218,50 +218,51 @@ in {
     urlview
     imgur-screenshot
     xfce.terminal
-    octave
+    byzanz
+    xorg.xwininfo
+    electron
 
     vim
     source-code-pro
+    ctags
 
     vagrant
-    kubernetes
 
-    rxvt_unicode-with-plugins
     vlc
     gitFull
-    mercurialFull
     chromium
     firefox
-    opera
     transmission_gtk
-    cmus
-    weechat
-    skype
     spotify
     dropbox-cli
+    calibre
 
     ghc
     go
     gocode
     rustc
     cargo
+    lua
+    elixir
 
     # pypy
     python27
-    python33
-    python34
-    python35
-    python35Packages.flake8
-    python35Packages.setuptools
-    python35Packages.youtube-dl
+    python36
+    python36Packages.pyqt5
+    python36Packages.flake8
+    python36Packages.setuptools
+    python36Packages.youtube-dl
     python27Packages.docker_compose
-    python35Packages.virtualenvwrapper
-    python35Packages.virtualenv
+    python36Packages.virtualenvwrapper
+    python36Packages.virtualenv
     python27Packages.setuptools
     ansible2
     libyaml
     zlib
+    
+    nodejs-8_x
+    yarn
 
-    mypkgs.popcorntime
+    networkmanager-l2tp
   ];
 }
